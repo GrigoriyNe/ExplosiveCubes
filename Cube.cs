@@ -1,11 +1,12 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Spawner))]
+
 public class Cube : MonoBehaviour
 {
     [SerializeField] private MeshRenderer _meshRenderer;
-    [SerializeField] Cube _prefab;
 
-    private Spawn _spawn;
+    private Spawner _spawn;
     private int _explosionForce = 10;
     private int _explosionRadius = 10;
     private int _chanceDivision = 100;
@@ -14,10 +15,18 @@ public class Cube : MonoBehaviour
 
     private void Awake()
     {
-        _spawn = GetComponent<Spawn>();
+        _spawn = GetComponent<Spawner>();
     }
 
-    public void Initialisation(Color color, int chanceDivide, Vector3 scale)
+    private void OnMouseDown()
+    {
+        if (CanDivide())
+            _spawn.Create(this);
+
+        Destroy(gameObject);
+    }
+
+    public void Init(Color color, int chanceDivide, Vector3 scale)
     {
         _meshRenderer.material.color = color;
         _chanceDivision = chanceDivide;
@@ -25,16 +34,6 @@ public class Cube : MonoBehaviour
 
         Rigidbody rigidbody = GetComponent<Rigidbody>();
         rigidbody.AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
-    }
-
-    private void OnMouseDown()
-    {
-        if (CanDivide())
-        {
-            _spawn.Create(_prefab);
-        }
-
-        Destroy(gameObject);
     }
 
     private bool CanDivide()
